@@ -33,6 +33,3 @@
 --     FOREIGN KEY (student_id) REFERENCES users(id) ON DELETE CASCADE,
 --     FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE
 -- );
-
-INSERT INTO users (username, password_hash, role) VALUES ('admin', 'admin', 'Admin')
--- SELECT * FROM users;
