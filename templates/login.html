@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../static/styles.css">
+    <title>login page</title>
+</head>
+<body>
+    <div class="container">
+        <h2>Grader login</h2>
+        <form action="/login" method="post">
+            <input type="text" autocomplete="off" name="username" placeholder="Username" required>
+            <input type="password" autocomplete="off" name="password" placeholder="Password" required>
+            <select name="role" required>
+                <option selected disabled vlaue="">role</option>
+                <option value="admin">Admin</option>
+                <option value="student">Student</option>
+                <option value="professor">Professor</option>
+            </select>
+            <button type="submit">Login</button>
+        </form>
+    </div>
+</body>
+</html>
