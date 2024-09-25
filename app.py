@@ -22,12 +22,42 @@ def hello_world():
 def admin():
     return render_template("admin.html")
 
-@app.route('/admin/users')
+@app.route('/admin/users', methods=["POST"])
 def admin_users():
-    return 'admin users'
+    if not request.form.get("username"):
+        flash("Must provide username")
+        return render_template("login.html")
+
+    # Ensure password was submitted
+    if not request.form.get("password"):
+        flash("Must provide password")
+        return render_template("login.html")
+    
+    #Ensure role was submitted
+    if not request.form.get("role"):
+        flash("Must enter role")
+        return render_template("login.html")
+    
+    if request.form.get("role") not in ['Student', 'Professor']:
+        flash("Invalid role")
+        return render_template("login.html")
+    
+    try:
+        hashed_password = generate_password_hash(request.form.get("password"), "pbkdf2")
+        db.execute("INSERT INTO users (username, password_hash, role) VALUES (?, ?, ?)", 
+                   request.form.get("username"),
+                   hashed_password,
+                   request.form.get("role")
+                   )
+        flash("User succesfully added")
+    except ValueError:
+        flash("User already exists")
+        return render_template("admin.html")
+    return render_template("admin.html")
 
 @app.route('/admin/courses')
 def admin_courses():
+    rows = db.execute("SELECT * FROM courses")
     return 'admin courses'
 
 @app.route('/admin/create_user', methods=['GET', 'POST'])
@@ -46,15 +76,22 @@ def login():
     if request.method == "POST":
         # Ensure username was submitted
         if not request.form.get("username"):
-            return render_template("invalid.html", message='Must provide username')
+            flash("Must provide username")
+            return render_template("login.html")
 
         # Ensure password was submitted
-        elif not request.form.get("password"):
-            return render_template("invalid.html", message='Must provide password')
+        if not request.form.get("password"):
+            flash("Must provide password")
+            return render_template("login.html")
         
         #Ensure role was submitted
-        elif not request.form.get("role"):
-            return render_template("invalid.html", message='Must provide role')
+        if not request.form.get("role"):
+            flash("Must enter role")
+            return render_template("login.html")
+        
+        if request.form.get("role") in ['Admin', 'Students', 'Professor']:
+            flash("Invalid role")
+            return render_template("login.html")
 
         # Query database for username
         rows = db.execute(
@@ -63,7 +100,8 @@ def login():
 
         # Ensure username exists and password is correct
         if len(rows) != 1 or request.form.get('password') != rows[0]['password_hash']:
-            return "INVALID login"
+            flash("Incorrect password/username")
+            return render_template("login.html")
 
         # Remember which user has logged in
         session["user_id"] = rows[0]["id"]
