@@ -28,9 +28,11 @@ main{
     text-align: center;
     /* height: 50vh; */
     min-width: 450px;
+    max-width: 600px;
     background-color: rgba(0, 0, 0, 0.311);
     border-radius: 15px;
     margin-top: 2em;
+    margin-bottom: 2em;
 }
 
 .container form{
@@ -86,4 +88,22 @@ main{
     color: white;
     text-align: center;
     line-height: 40px;
+}
+
+.admin_manage{
+    display: flex;
+    flex-direction: column;
+    max-width: 65%;
+    margin: auto;
+    text-align: center;
+    margin-bottom: 2em;
+}
+
+.admin_manage table, td, th{
+    border-bottom: 1px solid black;
+    border-collapse: collapse;
+}
+
+.admin_manage td{
+    height: 55px;
 }

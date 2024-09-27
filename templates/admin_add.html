@@ -1,0 +1,72 @@
+{% extends "admin.html" %}
+{% block main %}
+
+{% if get_flashed_messages() %}
+        <header>
+            <div class="alert alert-primary mb-0 text-center" role="alert">
+                {{ get_flashed_messages() | join(" ") }}
+            </div>
+        </header>
+{% endif %}
+
+<div class="container">
+    <h2>USERS</h2>
+    <form action="/admin/users" method="post">
+      <input type="text" name="username" placeholder="Username" required>
+      <input type="password" name="password" placeholder="Password" required>
+      <select name="role" required>
+        <option selected disabled value="">Role</option>
+        <option value="Student">Student</option>
+        <option value="Professor">Professor</option>
+    </select>
+    <div>
+      <button type="submit">Add</button>
+    </div>
+    <!-- {% if get_flashed_messages() %}
+        <header>
+            <div class="alert alert-primary mb-0 text-center" role="alert">
+                {{ get_flashed_messages() | join(" ") }}
+            </div>
+        </header>
+    {% endif %} -->
+    </form>
+</div>
+
+<div class="container">
+    <h2>COURSES</h2>
+    <form action="/admin/courses" method="post">
+      <input type="text" name="coursename" placeholder="Coursename" required>
+      <select name="professor" required>
+        <option selected disabled vlaue="">Professor</option>
+        {% if professors %}
+            {% for professor in professors %}
+                <option value="{{ professor.username }}">{{ professor.username }}</option>
+            {% endfor %}
+        {% else %}
+            <option disabled vlaue="">There are no professors</option>
+        {% endif %}
+        <!-- <option value="admin">Admin</option>
+        <option value="student">Student</option>
+        <option value="professor">Professor</option> -->
+    </select>
+    <div>
+      <button type="submit">Add</button>
+    </div>
+    <!-- {% if get_flashed_messages() %}
+        <header>
+            <div class="alert alert-primary mb-0 text-center" role="alert">
+                {{ get_flashed_messages() | join(" ") }}
+            </div>
+        </header>
+    {% endif %} -->
+    </form>
+</div>
+{% if get_flashed_messages() %}
+    <header>
+        <div class="alert alert-primary mb-0 text-center" role="alert">
+            {{ get_flashed_messages() | join(" ") }}
+        </div>
+    </header>
+{% endif %}
+
+{% endblock %}

@@ -22,47 +22,73 @@ def hello_world():
 def admin():
     return render_template("admin.html")
 
-@app.route('/admin/users', methods=["POST"])
+@app.route('/admin/users', methods=["POST", "GET"])
 def admin_users():
-    if not request.form.get("username"):
-        flash("Must provide username")
-        return render_template("login.html")
+    if request.method == "POST":
+        if not request.form.get("username"):
+            flash("Must provide username")
+            return render_template("admin_add.html")
 
-    # Ensure password was submitted
-    if not request.form.get("password"):
-        flash("Must provide password")
-        return render_template("login.html")
-    
-    #Ensure role was submitted
-    if not request.form.get("role"):
-        flash("Must enter role")
-        return render_template("login.html")
-    
-    if request.form.get("role") not in ['Student', 'Professor']:
-        flash("Invalid role")
-        return render_template("login.html")
-    
-    try:
-        hashed_password = generate_password_hash(request.form.get("password"), "pbkdf2")
-        db.execute("INSERT INTO users (username, password_hash, role) VALUES (?, ?, ?)", 
-                   request.form.get("username"),
-                   hashed_password,
-                   request.form.get("role")
-                   )
-        flash("User succesfully added")
-    except ValueError:
-        flash("User already exists")
-        return render_template("admin.html")
-    return render_template("admin.html")
+        # Ensure password was submitted
+        if not request.form.get("password"):
+            flash("Must provide password")
+            return render_template("admin_add.html")
+        
+        #Ensure role was submitted
+        if not request.form.get("role"):
+            flash("Must enter role")
+            return render_template("admin_add.html")
+        
+        if request.form.get("role") not in ['Student', 'Professor']:
+            flash("Invalid role")
+            return render_template("admin_add.html")
+        
+        try:
+            hashed_password = generate_password_hash(request.form.get("password"), "pbkdf2")
+            db.execute("INSERT INTO users (username, password_hash, role) VALUES (?, ?, ?)", 
+                    request.form.get("username"),
+                    hashed_password,
+                    request.form.get("role")
+                    )
+            flash("User succesfully added")
+        except ValueError:
+            flash("User already exists")
+            return render_template("admin_add.html")
+        return render_template("admin_add.html")
+    else:
+        professors = db.execute("SELECT * FROM users WHERE role = 'Professor'")
+        return render_template("admin_add.html", professors=professors)
 
-@app.route('/admin/courses')
+@app.route('/admin/courses', methods=["GET", "POST"])
 def admin_courses():
-    rows = db.execute("SELECT * FROM courses")
-    return 'admin courses'
+    if request.method == "POST":
+        if not request.form.get("coursename"):
+            flash("Must provide coursename")
+            return render_template("admin_add.html")
+        
+        if not request.form.get("professor"):
+            flash("Must provide professor's name")
+            return render_template("admin_add.html")
+        
+        id = db.execute("SELECT id FROM users WHERE username = ?", request.form.get("professor"))
+        db.execute("INSERT INTO courses (course_name, professor_id) VALUES (?, ?)", 
+                   request.form.get("coursename"), id[0]["id"] )
+        flash("Course succesfully added")
+        return render_template("admin_add.html")
 
-@app.route('/admin/create_user', methods=['GET', 'POST'])
-def admin_create_users():
-    return 'admin create users'
+    else:
+        professors = db.execute("SELECT * FROM users WHERE role = 'Professor'")
+        return render_template("admin_add.html", professors=professors)
+
+@app.route('/admin/manage', methods=['GET', 'POST'])
+def admin_manage_users():
+    users = db.execute("SELECT * FROM users WHERE role != 'Admin'")
+    courses = db.execute("SELECT * FROM courses")
+    return render_template("admin_view.html", users = users, courses = courses)
+
+@app.route('/admin/manage/<user_id>', methods=["POST", "GET"])
+def admin_remove_user(user_id):
+    return f"User {user_id} removed"
 
 #Authentication Routes
 @app.route('/login', methods=['GET', 'POST'])
