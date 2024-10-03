@@ -1,58 +1,56 @@
 {% extends "admin.html"%}
-
 {% block main%}
 
+    {% if courses %}
+        <div class="admin_manage">
+            <h1>Courses</h1>
+            <table>
+                <thead>
+                    <tr>
+                        <th>id</th>
+                        <th>course</th>
+                        <th>professor</th>
+                        <th>action</th>
+                    </tr>
+                </thead>
 
+                <tbody>
+                    {% for course in courses %}
+                    <tr>
+                        <td>{{ course.id }}</td>
+                        <td>{{ course.course_name }}</td>
+                        <td>{{ course.professor_id }}</td>
+                        <td><a href="/admin/manage/course/{{ course.id }}">Delete</a></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="admin_manage">
+            <h1>Users</h1>
+            <table>
+                <thead>
+                    <tr>
+                        <th>id</th>
+                        <th>name</th>
+                        <th>role</th>
+                        <th>action</th>
+                    </tr>
+                </thead>
 
-    <div class="admin_manage">
-        <h1>Users</h1>
-        <table>
-            <thead>
-                <tr>
-                    <th>id</th>
-                    <th>name</th>
-                    <th>role</th>
-                    <th>action</th>
-                </tr>
-            </thead>
-
-            <tbody>
-                {% for user in users %}
-                <tr>
-                    <td>{{ user.id }}</td>
-                    <td>{{ user.username }}</td>
-                    <td>{{ user.role }}</td>
-                    <td><a href="/admin/manage/{{ user.id }}">Delete</a></td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-
-    <div class="admin_manage">
-        <h1>Courses</h1>
-        <table>
-            <thead>
-                <tr>
-                    <th>id</th>
-                    <th>course</th>
-                    <th>professor</th>
-                    <th>action</th>
-                </tr>
-            </thead>
-
-            <tbody>
-                {% for course in courses %}
-                <tr>
-                    <td>{{ course.id }}</td>
-                    <td>{{ course.course_name }}</td>
-                    <td>{{ course.professor_id }}</td>
-                    <td><a href="/admin/manage/{{ course.id }}">Delete</a></td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-
-
+                <tbody>
+                    {% for user in users %}
+                    <tr>
+                        <td>{{ user.id }}</td>
+                        <td>{{ user.username }}</td>
+                        <td>{{ user.role }}</td>
+                        <td><a href="/admin/manage/user/{{ user.id }}">Delete</a></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
+        
 {% endblock%}

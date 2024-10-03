@@ -80,15 +80,19 @@ def admin_courses():
         professors = db.execute("SELECT * FROM users WHERE role = 'Professor'")
         return render_template("admin_add.html", professors=professors)
 
-@app.route('/admin/manage', methods=['GET', 'POST'])
+@app.route('/admin/manage/users', methods=['GET', 'POST'])
 def admin_manage_users():
     users = db.execute("SELECT * FROM users WHERE role != 'Admin'")
-    courses = db.execute("SELECT * FROM courses")
-    return render_template("admin_view.html", users = users, courses = courses)
+    return render_template("admin_view.html", users = users)
 
-@app.route('/admin/manage/<user_id>', methods=["POST", "GET"])
-def admin_remove_user(user_id):
-    return f"User {user_id} removed"
+@app.route('/admin/manage/courses', methods=['GET', 'POST'])
+def admin_manage_courses():
+    courses = db.execute("SELECT * FROM courses")
+    return render_template("admin_view.html", courses = courses)
+
+@app.route('/admin/manage/<role>/<id>', methods=["POST", "GET"])
+def admin_remove(role,id):
+    return f"{role} {id} removed"
 
 #Authentication Routes
 @app.route('/login', methods=['GET', 'POST'])
@@ -130,11 +134,11 @@ def login():
             return render_template("login.html")
 
         # Remember which user has logged in
-        session["user_id"] = rows[0]["id"]
+        # session["user_id"] = rows[0]["id"]
 
         # Redirect user to appropriate page
         if(rows[0]['role'] == 'Admin'):
-            return redirect("/admin")
+            return redirect("/admin/manage/users")
         
         if(rows[0]['role'] == 'Professor'):
             return redirect("/professor/courses")
