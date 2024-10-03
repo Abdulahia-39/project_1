@@ -92,7 +92,12 @@ def admin_manage_courses():
 
 @app.route('/admin/manage/<role>/<id>', methods=["POST", "GET"])
 def admin_remove(role,id):
-    return f"{role} {id} removed"
+    if role == "user":
+        db.execute("DELETE FROM users WHERE id = ?", id)
+    else:
+        db.execute("DELETE FROM courses WHERE id = ?", id)
+    flash(f"{role} {id} removed")
+    return redirect("/admin/manage/users")
 
 #Authentication Routes
 @app.route('/login', methods=['GET', 'POST'])
