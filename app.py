@@ -6,9 +6,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 
 app = Flask(__name__)
 
-app.config["SESSION_PERMANENT"] = False
-app.config["SESSION_TYPE"] = "filesystem"
-Session(app)
+app.config['SECRET_KEY'] = 'abdala'
 
 db = SQL("sqlite:///project.db")
 
@@ -143,12 +141,15 @@ def login():
 
         # Redirect user to appropriate page
         if(rows[0]['role'] == 'Admin'):
+            session["user_id"] = rows[0]["id"]
             return redirect("/admin/manage/users")
         
         if(rows[0]['role'] == 'Professor'):
+            session["user_id"] = rows[0]["id"]
             return redirect("/professor/courses")
         
-        if(rows[0]['role'] == 'Ptudent'):
+        if(rows[0]['role'] == 'Student'):
+            session["user_id"] = rows[0]["id"]
             return redirect("/student/courses")
 
     # User reached route via GET (as by clicking a link or via redirect)
@@ -159,7 +160,13 @@ def login():
 
 @app.route('/logout')
 def logout():
-    return 'logout page'
+    """Log user out"""
+
+    # Forget any user_id
+    session.pop('user_id', None)
+
+    # Redirect user to login form
+    return redirect("/")
 
 #Dashboard
 @app.route("/dashboard")
@@ -169,7 +176,11 @@ def dashboard():
 #Students routes
 @app.route("/student/courses")
 def student_courses():
-    return 'Student courses page'
+    return render_template('student.html')
+
+@app.route("/student/courses/enroll")
+def enroll_courses():
+    return 'Student enroll page'
 
 @app.route("/student/courses/<course_id>")
 def student_courses_id(course_id):
@@ -178,7 +189,10 @@ def student_courses_id(course_id):
 #Professor routes
 @app.route("/professor/courses")
 def professor_courses():
-    return 'Student courses page'
+    courses = db.execute(
+            "SELECT * FROM courses WHERE professor_id = ?", session["user_id"]
+        )
+    return render_template('professor.html', courses = courses)
 
 @app.route("/professor/courses/<course_id>")
 def professor_courses_id(course_id):
